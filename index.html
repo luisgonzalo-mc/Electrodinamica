@@ -268,8 +268,52 @@ function startMusic(){stopMusic();if(!musicOn)return;const melody=[392,494,587,4
 $('musicBtn').onclick=()=>{musicOn=!musicOn;$('musicBtn').textContent='♫ Música: '+(musicOn?'activada':'apagada');if(musicOn)startMusic();else stopMusic()};$('soundBtn').onclick=()=>{soundOn=!soundOn;$('soundBtn').textContent=(soundOn?'🔊 Sonidos: activados':'🔇 Sonidos: apagados');if(soundOn&&musicOn)startMusic()};
 const canvas=$('wheel'),ctx=canvas.getContext('2d');function drawWheel(angle=0){const n=CATS.length,r=canvas.width/2,arc=2*Math.PI/n;ctx.clearRect(0,0,700,700);ctx.save();ctx.translate(r,r);ctx.rotate(angle);for(let i=0;i<n;i++){const a0=-Math.PI/2+i*arc,a1=a0+arc;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r-13,a0,a1);ctx.closePath();ctx.fillStyle=CATS[i].color;ctx.fill();ctx.lineWidth=7;ctx.strokeStyle='#fff';ctx.stroke();ctx.save();ctx.rotate(a0+arc/2);ctx.textAlign='right';ctx.fillStyle='#17213d';ctx.font='900 25px system-ui';const words=CATS[i].short.split(' ');if(words.length>1){ctx.fillText(words[0],r-45,-4);ctx.fillText(words.slice(1).join(' '),r-45,25)}else ctx.fillText(words[0],r-45,9);ctx.restore()}ctx.beginPath();ctx.arc(0,0,64,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=8;ctx.strokeStyle='#29375d';ctx.stroke();ctx.restore()}drawWheel();
 
-$('registerForm').addEventListener('submit',async e=>{
+$('registerForm').addEventListener('submit', async e => {
   e.preventDefault();
+  const name = $('studentName').value.trim();
+  const course = $('course').value;
+  if (name.length < 3 || !course) return;
+
+  // Normalizamos el nombre para evitar duplicados por mayúsculas o espacios extra
+  const normalizedName = name.toLowerCase().replace(/\s+/g, ' ');
+
+  // Verificamos localmente en este navegador si ya participó
+  const localParticipations = JSON.parse(localStorage.getItem('ruletaEstudiantesUnicos') || '{}');
+  if (localParticipations[normalizedName]) {
+    alert('Este estudiante ya tiene una participación registrada. Solo se permite un intento por alumno.');
+    return;
+  }
+
+  // Verificamos también en la base de datos de Supabase (si está conectada)
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient
+        .from('participaciones')
+        .select('nombre')
+        .ilike('nombre', name); // Busca el nombre sin importar mayúsculas/minúsculas
+
+      if (data && data.length > 0) {
+        alert('Este nombre ya se encuentra registrado en la base de datos institucional. Solo se permite una participación.');
+        return;
+      }
+    } catch (err) {
+      console.error('Error al verificar duplicados:', err);
+    }
+  }
+
+  // Guardamos localmente para bloquear futuros intentos en este mismo dispositivo
+  localParticipations[normalizedName] = true;
+  localStorage.setItem('ruletaEstudiantesUnicos', JSON.stringify(localParticipations));
+
+  student = { name, course };
+  score = 0; correct = 0; streak = 0; round = 0; usedQuestionIds = new Set();
+  $('studentBadge').textContent = name + ' · ' + course;
+  updateStats();
+  show('gameScreen');
+  startMusic();
+  sfx('click');
+  resetRound();
+});
   const name=$('studentName').value.trim(),course=$('course').value;
   if(name.length<3||!course)return;
   student={name,course};

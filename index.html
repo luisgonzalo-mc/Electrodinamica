@@ -1,91 +1,230 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Ruleta de la Electricidad | FÌsica</title>
-<!-- LibrerÌa cliente de Supabase -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruleta de la Electricidad | F√≠sica</title>
+<!-- Librer√≠a cliente de Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{--bg:#eef7fb;--panel:#ffffff;--ink:#172b3a;--muted:#526b7a;--gold:#ffd166;--cyan:#00a6d6;--pink:#e85d75;--green:#16a879;--purple:#6c63d9}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#d7f1fb 0,#f3f9fc 60%);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:13px;padding:12px 17px;font-weight:800;background:var(--gold);color:#20213a;box-shadow:0 4px 0 #c29d25;transition:.15s}button:hover{transform:translateY(-1px)}button:disabled{opacity:.5;cursor:not-allowed;transform:none}.secondary{background:#31566b;color:white;box-shadow:0 4px 0 #203e50}.danger{background:#ff7694;color:#351222;box-shadow:0 4px 0 #bd4a68}.wrap{max-width:1100px;margin:auto;padding:20px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{font-size:clamp(1.3rem,3vw,2rem);font-weight:1000;letter-spacing:.4px}.brand span{color:var(--gold)}.tag{color:var(--muted);font-size:.9rem}.panel{background:linear-gradient(145deg,#ffffff,#f4fbff);border:1px solid #b7d9e7;border-radius:24px;padding:clamp(16px,3vw,28px);box-shadow:0 16px 45px #1b536b1a}.screen{display:none}.screen.active{display:block}.intro{max-width:600px;margin:35px auto}.intro h1{font-size:clamp(2rem,5vw,3.4rem);line-height:1.03;margin:8px 0 12px}.intro h1 em{font-style:normal;color:var(--gold)}.field{display:grid;gap:7px;margin:15px 0}.field label{font-weight:800;color:#24495c}.field input,.field select{width:100%;border:1px solid #9bbdcd;background:#ffffff;color:#172b3a;border-radius:12px;padding:13px}.note{font-size:.85rem;color:var(--muted);line-height:1.45}.full{width:100%;margin-top:7px}.gamegrid{display:grid;grid-template-columns:minmax(270px,1fr) minmax(300px,1fr);gap:22px;align-items:center;margin-top:20px}.wheelbox{position:relative;max-width:480px;width:100%;margin:auto}.wheelbox canvas{width:100%;height:auto;display:block;filter:drop-shadow(0 12px 20px #0007)}.pointer{position:absolute;z-index:2;top:-4px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-top:43px solid #fff;filter:drop-shadow(0 4px 4px #0008)}.centerwheel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:24%;aspect-ratio:1;border-radius:50%;background:linear-gradient(145deg,#fff,#c8d5ff);border:7px solid #25355c;display:grid;place-items:center;color:#182345;font-size:clamp(1.2rem,4vw,2.4rem);font-weight:1000}.stats{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0 18px}.stat{background:#e8f4f9;border:1px solid #bfd9e4;border-radius:13px;padding:9px 13px;flex:1;min-width:85px}.stat small{display:block;color:var(--muted)}.stat strong{font-size:1.3rem}.category{font-size:.78rem;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);font-weight:900}.question{font-size:clamp(1.2rem,2.8vw,1.65rem);line-height:1.25;margin:8px 0 16px}.answers{display:grid;gap:10px}.answer{background:#edf7fb;border:1px solid #b4d5e2;box-shadow:none;color:#17384a;text-align:left;padding:13px 15px;border-radius:13px}.answer.correct{background:#d5f7e8;border-color:#16a879;color:#124b38}.answer.wrong{background:#ffe0e7;border-color:#e85d75;color:#6b2334}.feedback{min-height:62px;margin-top:13px;color:#355668;line-height:1.45}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.bar{height:8px;background:#d8eaf1;border-radius:20px;overflow:hidden;margin:12px 0}.bar div{height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--gold));transition:width .3s}.timerbox{margin:12px 0 16px;padding:12px 14px;background:#e8f4f9;border:1px solid #bfd9e4;border-radius:14px}.timerhead{display:flex;justify-content:space-between;gap:10px;align-items:center;font-weight:800}.timerbar{height:12px;background:#d3e5ec;border-radius:20px;overflow:hidden;margin-top:9px;border:1px solid #35466f}.timerbar div{height:100%;width:100%;background:linear-gradient(90deg,#70e3a1,#ffd84d);transition:width .1s linear}.timerbar div.urgent{background:linear-gradient(90deg,#ff9a7a,#ff4f78)}.tiny{font-size:.8rem;color:var(--muted)}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:600px}th,td{text-align:left;padding:11px;border-bottom:1px solid #3b4a72}th{color:var(--gold)}.teacherhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.empty{padding:24px;text-align:center;color:var(--muted)}.pill{border-radius:99px;background:#33436b;padding:5px 10px;font-size:.8rem;color:#24495c}.footer{text-align:center;color:#5c7888;font-size:.78rem;padding:25px 0}.confetti-layer{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}.confetti-layer i{position:absolute;top:-20px;width:9px;height:15px;border-radius:2px;animation:confetti-fall 2.6s ease-in forwards}@keyframes confetti-fall{0%{top:-25px;opacity:1;transform:translateX(0) rotate(0)}100%{top:110vh;opacity:0;transform:translateX(var(--drift)) rotate(900deg)}}.hidden{display:none!important}@media(max-width:760px){.gamegrid{grid-template-columns:1fr}.wheelbox{max-width:390px}.intro{margin:18px auto}.wrap{padding:12px}}
-</style></head>
-<body><div class="wrap">
-<header class="top"><div><div class="brand">? RULETA <span>DE LA ELECTRICIDAD</span></div><div class="tag">DesafÌo de FÌsica ∑ 6.∫ de Secundaria ∑ Electricidad y cargas elÈctricas</div></div><div class="actions"><button id="musicBtn" class="secondary" type="button">? M˙sica: activada</button><button id="soundBtn" class="secondary" type="button">?? Sonidos: activados</button></div></header>
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="brand">‚ö° RULETA <span>DE LA ELECTRICIDAD</span></div>
+    <div class="tag">Desaf√≠o de F√≠sica ¬∑ 6.¬∫ de Secundaria ¬∑ Electricidad y cargas el√©ctricas</div>
+  </div>
+  <div class="actions">
+    <button id="musicBtn" class="secondary" type="button">‚ô´ M√∫sica: activada</button>
+    <button id="soundBtn" class="secondary" type="button">üîä Sonidos: activados</button>
+  </div>
+</header>
 <main>
-<section id="registerScreen" class="screen active"><div class="panel intro"><div class="pill">?? APRENDE ∑ GIRA ∑ GANA</div><h1>øCu·nto sabes de <em>electricidad y cargas?</em></h1><p class="note">? Cargas elÈctricas, circuitos, resistencia y Ley de Ohm. Gira la ruleta, responde antes de que termine el tiempo y celebra cada acierto con una lluvia de confeti.</p><form id="registerForm"><div class="field"><label for="studentName">Nombre y apellido del estudiante</label><input id="studentName" name="studentName" maxlength="80" required autocomplete="name" placeholder="Ej.: Ana PÈrez"></div><div class="field"><label for="course">Curso</label><select id="course" required><option value="">Selecciona tu curso</option><option>6.∫ A</option><option>6.∫ B</option><option>6.∫ C</option></select></div><button class="full" type="submit">°COMENZAR EL DESAFÕO! ?</button></form><p class="note">Tus resultados se guardan directamente en la base de datos institucional.</p><div class="actions"><button class="secondary" id="teacherEntry" type="button">?? Acceso docente</button></div></div></section>
-<section id="gameScreen" class="screen"><div class="panel"><div class="top"><div><div class="pill" id="studentBadge">Estudiante</div><h2 style="margin:10px 0 0">°Que empiece el desafÌo!</h2></div><div class="stats" style="margin:0"><div class="stat"><small>Puntaje</small><strong id="score">0</strong></div><div class="stat"><small>Ronda</small><strong id="round">1/15</strong></div><div class="stat"><small>Racha</small><strong id="streak">0 ??</strong></div></div></div><div class="bar"><div id="progress"></div></div><div class="gamegrid"><div><div class="wheelbox"><div class="pointer"></div><canvas id="wheel" width="700" height="700" aria-label="Ruleta de tres categorÌas"></canvas><div class="centerwheel">?</div></div><div style="text-align:center;margin-top:12px"><button id="spinBtn" type="button">?? GIRAR RULETA</button><p class="tiny">La ruleta elige tu categorÌa al azar.</p></div></div><div><div id="questionArea"><div class="category">LISTO PARA GIRAR</div><h3 class="question">Gira la ruleta para descubrir tu pregunta.</h3><p class="note">Cada respuesta correcta suma 3 puntos. °Tienes 15 rondas y un banco ampliado de 45 preguntas!</p></div><div class="timerbox"><div class="timerhead"><span>? TIEMPO PARA RESPONDER</span><span id="timerText">15 s</span></div><div class="timerbar"><div id="timerFill"></div></div></div><div id="answers" class="answers"></div><div id="feedback" class="feedback" aria-live="polite"></div><div class="actions"><button id="nextBtn" class="hidden" type="button">Siguiente ronda ?</button></div></div></div></div></section>
-<section id="resultScreen" class="screen"><div class="panel intro" style="text-align:center"><div style="font-size:3.5rem">??</div><h1>°DesafÌo completado!</h1><p id="resultSummary"></p><div class="stats"><div class="stat"><small>Puntaje final</small><strong id="finalScore">0</strong></div><div class="stat"><small>Correctas</small><strong id="finalCorrect">0/15</strong></div></div><p class="note">Tu participaciÛn ha sido guardada exitosamente en el sistema.</p><button id="finishBtn" class="full" type="button">Finalizar</button></div></section>
-<section id="teacherScreen" class="screen"><div class="panel"><div class="teacherhead"><div><div class="category">PANEL PRIVADO DEL DOCENTE</div><h2 style="margin:5px 0">Registro de participaciones</h2></div><button class="secondary" id="backBtn" type="button">? Volver</button></div><div id="teacherLogin"><p class="note">Introduce el cÛdigo docente para consultar los puntajes.</p><form id="teacherForm"><div class="field"><label for="teacherCode">CÛdigo de ingreso</label><input id="teacherCode" type="password" inputmode="numeric" required placeholder="CÛdigo docente"></div><button type="submit">Ingresar al panel</button></form></div><div id="teacherData" class="hidden"><div class="stats"><div class="stat"><small>Participaciones</small><strong id="totalStudents">0</strong></div><div class="stat"><small>Promedio</small><strong id="averageScore">0</strong></div><div class="stat"><small>Mejor puntaje</small><strong id="bestScore">0</strong></div></div><div class="actions" style="margin-bottom:14px"><button id="exportBtn" type="button">? Descargar CSV</button><button id="refreshRecordsBtn" class="secondary" type="button">?? Actualizar datos</button></div><div class="tablewrap"><table><thead><tr><th>#</th><th>Estudiante</th><th>Curso</th><th>Puntaje</th><th>Correctas</th><th>Fecha</th></tr></thead><tbody id="recordsBody"></tbody></table></div><p class="note">Datos sincronizados en tiempo real desde Supabase.</p></div></div></section>
-</main><div class="footer">Recurso did·ctico de FÌsica ∑ Electricidad y cargas elÈctricas ∑ 6.∫ de Secundaria</div></div>
+<section id="registerScreen" class="screen active">
+  <div class="panel intro">
+    <div class="pill">üéØ APRENDE ¬∑ GIRA ¬∑ GANA</div>
+    <h1>¬øCu√°nto sabes de <em>electricidad y cargas?</em></h1>
+    <p class="note">‚ö° Cargas el√©ctricas, circuitos, resistencia y Ley de Ohm. Gira la ruleta, responde antes de que termine el tiempo y celebra cada acierto con una lluvia de confeti.</p>
+    <form id="registerForm">
+      <div class="field">
+        <label for="studentName">Nombre y apellido del estudiante</label>
+        <input id="studentName" name="studentName" maxlength="80" required autocomplete="name" placeholder="Ej.: Ana P√©rez">
+      </div>
+      <div class="field">
+        <label for="course">Curso</label>
+        <select id="course" required>
+          <option value="">Selecciona tu curso</option>
+          <option>6.¬∫ A</option>
+          <option>6.¬∫ B</option>
+          <option>6.¬∫ C</option>
+        </select>
+      </div>
+      <button class="full" type="submit">¬°COMENZAR EL DESAF√çO! ‚ûú</button>
+    </form>
+    <p class="note">Tus resultados se guardan directamente en la base de datos institucional.</p>
+    <div class="actions">
+      <button class="secondary" id="teacherEntry" type="button">üîê Acceso docente</button>
+    </div>
+  </div>
+</section>
+
+<section id="gameScreen" class="screen">
+  <div class="panel">
+    <div class="top">
+      <div>
+        <div class="pill" id="studentBadge">Estudiante</div>
+        <h2 style="margin:10px 0 0">¬°Que empiece el desaf√≠o!</h2>
+      </div>
+      <div class="stats" style="margin:0">
+        <div class="stat"><small>Puntaje</small><strong id="score">0</strong></div>
+        <div class="stat"><small>Ronda</small><strong id="round">1/15</strong></div>
+        <div class="stat"><small>Racha</small><strong id="streak">0 üî•</strong></div>
+      </div>
+    </div>
+    <div class="bar"><div id="progress"></div></div>
+    <div class="gamegrid">
+      <div>
+        <div class="wheelbox">
+          <div class="pointer"></div>
+          <canvas id="wheel" width="700" height="700" aria-label="Ruleta de tres categor√≠as"></canvas>
+          <div class="centerwheel">‚ö°</div>
+        </div>
+        <div style="text-align:center;margin-top:12px">
+          <button id="spinBtn" type="button">üé° GIRAR RULETA</button>
+          <p class="tiny">La ruleta elige tu categor√≠a al azar.</p>
+        </div>
+      </div>
+      <div>
+        <div id="questionArea">
+          <div class="category">LISTO PARA GIRAR</div>
+          <h3 class="question">Gira la ruleta para descubrir tu pregunta.</h3>
+          <p class="note">Cada respuesta correcta suma 3 puntos. ¬°Tienes 15 rondas y un banco ampliado de 45 preguntas!</p>
+        </div>
+        <div class="timerbox">
+          <div class="timerhead"><span>‚è± TIEMPO PARA RESPONDER</span><span id="timerText">15 s</span></div>
+          <div class="timerbar"><div id="timerFill"></div></div>
+        </div>
+        <div id="answers" class="answers"></div>
+        <div id="feedback" class="feedback" aria-live="polite"></div>
+        <div class="actions">
+          <button id="nextBtn" class="hidden" type="button">Siguiente ronda ‚ûú</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="resultScreen" class="screen">
+  <div class="panel intro" style="text-align:center">
+    <div style="font-size:3.5rem">üèÜ</div>
+    <h1>¬°Desaf√≠o completado!</h1>
+    <p id="resultSummary"></p>
+    <div class="stats">
+      <div class="stat"><small>Puntaje final</small><strong id="finalScore">0</strong></div>
+      <div class="stat"><small>Correctas</small><strong id="finalCorrect">0/15</strong></div>
+    </div>
+    <p class="note">Tu participaci√≥n ha sido guardada exitosamente en el sistema.</p>
+    <button id="finishBtn" class="full" type="button">Finalizar</button>
+  </div>
+</section>
+
+<section id="teacherScreen" class="screen">
+  <div class="panel">
+    <div class="teacherhead">
+      <div>
+        <div class="category">PANEL PRIVADO DEL DOCENTE</div>
+        <h2 style="margin:5px 0">Registro de participaciones</h2>
+      </div>
+      <button class="secondary" id="backBtn" type="button">‚Üê Volver</button>
+    </div>
+    <div id="teacherLogin">
+      <p class="note">Introduce el c√≥digo docente para consultar los puntajes.</p>
+      <form id="teacherForm">
+        <div class="field">
+          <label for="teacherCode">C√≥digo de ingreso</label>
+          <input id="teacherCode" type="password" inputmode="numeric" required placeholder="C√≥digo docente">
+        </div>
+        <button type="submit">Ingresar al panel</button>
+      </form>
+    </div>
+    <div id="teacherData" class="hidden">
+      <div class="stats">
+        <div class="stat"><small>Participaciones</small><strong id="totalStudents">0</strong></div>
+        <div class="stat"><small>Promedio</small><strong id="averageScore">0</strong></div>
+        <div class="stat"><small>Mejor puntaje</small><strong id="bestScore">0</strong></div>
+      </div>
+      <div class="actions" style="margin-bottom:14px">
+        <button id="exportBtn" type="button">‚¨á Descargar CSV</button>
+        <button id="refreshRecordsBtn" class="secondary" type="button">üîÑ Actualizar datos</button>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Estudiante</th><th>Curso</th><th>Puntaje</th><th>Correctas</th><th>Fecha</th></tr>
+          </thead>
+          <tbody id="recordsBody"></tbody>
+        </table>
+      </div>
+      <p class="note">Datos sincronizados en tiempo real desde Supabase.</p>
+    </div>
+  </div>
+</section>
+</main>
+<div class="footer">Recurso did√°ctico de F√≠sica ¬∑ Electricidad y cargas el√©ctricas ¬∑ 6.¬∫ de Secundaria</div>
+</div>
+
 <script>
 (()=>{'use strict';
 
-// CONFIGURACI”N DE SUPABASE (Reemplaza con tus datos reales)
-const SUPABASE_URL = 'https://tdkuwicdwzalkigpbuup.supabase.co'; 
-const SUPABASE_ANON_KEY = 'sb_publishable_zDMnM3UfPqO4-EF-dgID3g_lUz49O60';
+// CONFIGURACI√ìN DE SUPABASE (Tus credenciales se mantienen)
+const SUPABASE_URL = 'TU_SUPABASE_URL'; 
+const SUPABASE_ANON_KEY = 'TU_SUPABASE_ANON_KEY';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const CATS=[
-{name:'Electrodin·mica',short:'ELECTRODIN¡MICA',color:'#41c7f4'},
-{name:'Resistencia elÈctrica',short:'RESISTENCIA',color:'#ffc857'},
+{name:'Electrodin√°mica',short:'ELECTRODIN√ÅMICA',color:'#41c7f4'},
+{name:'Resistencia el√©ctrica',short:'RESISTENCIA',color:'#ffc857'},
 {name:'Ley de Ohm',short:'LEY DE OHM',color:'#62d6a8'}
 ];
 const QS=[
 [
-{q:'øQuÈ es la corriente elÈctrica?',a:['Movimiento ordenado de cargas elÈctricas','Choque de neutrones dentro del cable','DesapariciÛn de electrones'],c:0,e:'La corriente elÈctrica es el movimiento neto y ordenado de cargas elÈctricas.'},
-{q:'øQuÈ partÌculas se mueven principalmente en un cable met·lico?',a:['Protones','Electrones libres','Neutrones'],c:1,e:'En los metales, los portadores mÛviles de carga son principalmente los electrones libres.'},
-{q:'øCu·l es el sentido convencional de la corriente en el circuito externo?',a:['Del polo positivo al negativo','Del polo negativo al positivo','Siempre de arriba hacia abajo'],c:0,e:'Por convenio, la corriente va del potencial positivo al negativo; los electrones se mueven en sentido contrario.'},
-{q:'øEn quÈ unidad se mide la intensidad de corriente?',a:['Coulomb (C)','Amperio (A)','Voltio (V)'],c:1,e:'La intensidad de corriente se mide en amperios (A).'},
-{q:'Por una secciÛn pasan 18 C en 6 s. øQuÈ intensidad circula?',a:['3 A','12 A','108 A'],c:0,e:'I = Q/t = 18 C / 6 s = 3 A.'},
-{q:'øQuÈ representa una carga elÈctrica de 1 coulomb que atraviesa un punto en 1 segundo?',a:['Una corriente de 1 A','Una resistencia de 1 O','Un voltaje de 1 V'],c:0,e:'Un amperio equivale al paso de un coulomb por segundo: I = Q/t.'},
-{q:'øQuÈ instrumento mide la intensidad de corriente?',a:['VoltÌmetro','AmperÌmetro','TermÛmetro'],c:1,e:'El amperÌmetro mide la intensidad y se conecta en serie para medir la corriente del circuito.'},
-{q:'øCÛmo se conecta normalmente un amperÌmetro para medir la corriente de una rama?',a:['En serie','En paralelo','Sin cerrar el circuito'],c:0,e:'En serie, la misma corriente que pasa por la rama atraviesa el amperÌmetro.'},
-{q:'Si pasan m·s cargas por segundo por un conductor, la intensidadÖ',a:['Aumenta','Disminuye siempre','No puede cambiar'],c:0,e:'La intensidad mide la cantidad de carga que atraviesa una secciÛn por unidad de tiempo.'},
-{q:'En un circuito met·lico, el movimiento real de electrones esÖ',a:['Opuesto al sentido convencional de la corriente','Igual al sentido convencional','Perpendicular al cable siempre'],c:0,e:'Los electrones tienen carga negativa y se desplazan en sentido opuesto a la corriente convencional.'},
-{q:'øQuÈ condiciÛn permite una corriente sostenida en un circuito simple?',a:['Un camino cerrado y una diferencia de potencial','Un cable cortado','Solo una bombilla sin fuente'],c:0,e:'La fuente mantiene una diferencia de potencial y el circuito cerrado permite el movimiento de cargas.'},
-{q:'Si 5 C atraviesan una secciÛn en 2 s, la intensidad media esÖ',a:['2,5 A','10 A','0,4 A'],c:0,e:'I = Q/t = 5/2 = 2,5 A.'},
-{q:'øQuÈ sucede con la corriente si se abre un interruptor en un circuito simple?',a:['Se interrumpe la corriente','La corriente se duplica','La resistencia desaparece'],c:0,e:'Al abrirse el circuito se rompe el camino conductor y deja de circular corriente sostenida.'},
-{q:'øCu·l de estas partÌculas posee carga elÈctrica negativa?',a:['ProtÛn','ElectrÛn','NeutrÛn'],c:1,e:'El electrÛn tiene carga negativa; el protÛn positiva y el neutrÛn no tiene carga neta.'},
-{q:'øCu·l es la relaciÛn correcta entre carga, intensidad y tiempo?',a:['Q = I∑t','Q = I/t','Q = t/I'],c:0,e:'De I = Q/t se obtiene Q = I∑t.'}
+{q:'¬øQu√© es la corriente el√©ctrica?',a:['Movimiento ordenado de cargas el√©ctricas','Choque de neutrones dentro del cable','Desaparici√≥n de electrones'],c:0,e:'La corriente el√©ctrica es el movimiento neto y ordenado de cargas el√©ctricas.'},
+{q:'¬øQu√© part√≠culas se mueven principalmente en un cable met√°lico?',a:['Protones','Electrones libres','Neutrones'],c:1,e:'En los metales, los portadores m√≥viles de carga son principalmente los electrones libres.'},
+{q:'¬øCu√°l es el sentido convencional de la corriente en el circuito externo?',a:['Del polo positivo al negativo','Del polo negativo al positivo','Siempre de arriba hacia abajo'],c:0,e:'Por convenio, la corriente va del potencial positivo al negativo; los electrones se mueven en sentido contrario.'},
+{q:'¬øEn qu√© unidad se mide la intensidad de corriente?',a:['Coulomb (C)','Amperio (A)','Voltio (V)'],c:1,e:'La intensidad de corriente se mide en amperios (A).'},
+{q:'Por una secci√≥n pasan 18 C en 6 s. ¬øQu√© intensidad circula?',a:['3 A','12 A','108 A'],c:0,e:'I = Q/t = 18 C / 6 s = 3 A.'},
+{q:'¬øQu√© representa una carga el√©ctrica de 1 coulomb que atraviesa un punto en 1 segundo?',a:['Una corriente de 1 A','Una resistencia de 1 Œ©','Un voltaje de 1 V'],c:0,e:'Un amperio equivale al paso de un coulomb por segundo: I = Q/t.'},
+{q:'¬øQu√© instrumento mide la intensidad de corriente?',a:['Volt√≠metro','Amper√≠metro','Term√≥metro'],c:1,e:'El amper√≠metro mide la intensidad y se conecta en serie para medir la corriente del circuito.'},
+{q:'¬øC√≥mo se conecta normalmente un amper√≠metro para medir la corriente de una rama?',a:['En serie','En paralelo','Sin cerrar el circuito'],c:0,e:'En serie, la misma corriente que pasa por la rama atraviesa el amper√≠metro.'},
+{q:'Si pasan m√°s cargas por segundo por un conductor, la intensidad‚Ä¶',a:['Aumenta','Disminuye siempre','No puede cambiar'],c:0,e:'La intensidad mide la cantidad de carga que atraviesa una secci√≥n por unidad de tiempo.'},
+{q:'En un circuito met√°lico, el movimiento real de electrones es‚Ä¶',a:['Opuesto al sentido convencional de la corriente','Igual al sentido convencional','Perpendicular al cable siempre'],c:0,e:'Los electrones tienen carga negativa y se desplazan en sentido opuesto a la corriente convencional.'},
+{q:'¬øQu√© condici√≥n permite una corriente sostenida en un circuito simple?',a:['Un camino cerrado y una diferencia de potencial','Un cable cortado','Solo una bombilla sin fuente'],c:0,e:'La fuente mantiene una diferencia de potencial y el circuito cerrado permite el movimiento de cargas.'},
+{q:'Si 5 C atraviesan una secci√≥n en 2 s, la intensidad media es‚Ä¶',a:['2,5 A','10 A','0,4 A'],c:0,e:'I = Q/t = 5/2 = 2,5 A.'},
+{q:'¬øQu√© sucede con la corriente si se abre un interruptor en un circuito simple?',a:['Se interrumpe la corriente','La corriente se duplica','La resistencia desaparece'],c:0,e:'Al abrirse el circuito se rompe el camino conductor y deja de circular corriente sostenida.'},
+{q:'¬øCu√°l de estas part√≠culas posee carga el√©ctrica negativa?',a:['Prot√≥n','Electr√≥n','Neutr√≥n'],c:1,e:'El electr√≥n tiene carga negativa; el prot√≥n positiva y el neutr√≥n no tiene carga neta.'},
+{q:'¬øCu√°l es la relaci√≥n correcta entre carga, intensidad y tiempo?',a:['Q = I¬∑t','Q = I/t','Q = t/I'],c:0,e:'De I = Q/t se obtiene Q = I¬∑t.'}
 ],
 [
-{q:'øQuÈ expresa la ley de Pouillet para un conductor uniforme?',a:['R = ?L/A','R = I/V','R = Q∑t'],c:0,e:'La resistencia depende de la resistividad, la longitud y el ·rea transversal: R = ?L/A.'},
-{q:'Si la longitud de un alambre se triplica y todo lo dem·s permanece constante, la resistenciaÖ',a:['Se triplica','Se reduce a un tercio','No cambia'],c:0,e:'La resistencia es directamente proporcional a la longitud.'},
-{q:'Si el ·rea transversal se duplica, manteniendo iguales los dem·s factores, la resistenciaÖ',a:['Se duplica','Se reduce a la mitad','Se cuadruplica'],c:1,e:'La resistencia es inversamente proporcional al ·rea transversal.'},
-{q:'øQuÈ sÌmbolo representa la resistividad del material?',a:['? (rho)','Q','t'],c:0,e:'La resistividad ? caracteriza la oposiciÛn propia del material al paso de corriente.'},
-{q:'øCu·l de estos materiales suele ser un buen conductor elÈctrico?',a:['Cobre','Vidrio seco','Caucho'],c:0,e:'El cobre tiene muchos electrones libres y se utiliza ampliamente en cables elÈctricos.'},
-{q:'øCu·l es un ejemplo tÌpico de material aislante?',a:['Aluminio','Cobre','Pl·stico seco'],c:2,e:'El pl·stico seco dificulta el movimiento de cargas y se usa como aislante.'},
-{q:'øQuÈ ocurre con la resistencia de un mismo material si aumenta su longitud?',a:['Aumenta','Disminuye','Siempre vale cero'],c:0,e:'Un conductor m·s largo ofrece mayor resistencia, si el ·rea y el material no cambian.'},
-{q:'Dos alambres del mismo material y longitud: uno tiene el doble de ·rea que el otro. El m·s grueso tieneÖ',a:['La mitad de resistencia','El doble de resistencia','La misma resistencia necesariamente'],c:0,e:'Al duplicar el ·rea transversal, la resistencia se reduce a la mitad.'},
-{q:'øQuÈ magnitud caracteriza la oposiciÛn de un objeto concreto al paso de corriente?',a:['Resistencia elÈctrica','Carga elemental','Tiempo de recorrido'],c:0,e:'La resistencia elÈctrica se mide en ohmios (O) y depende del material y de la geometrÌa.'},
-{q:'øEn quÈ unidad se mide la resistencia elÈctrica?',a:['Ohmio (O)','Amperio (A)','Coulomb (C)'],c:0,e:'La unidad de resistencia en el SI es el ohmio.'},
-{q:'Un alambre se hace m·s delgado, conservando material y longitud. Su resistenciaÖ',a:['Aumenta','Disminuye','No cambia'],c:0,e:'Al disminuir el ·rea de secciÛn, aumenta la resistencia.'},
-{q:'øQuÈ ocurre con la resistencia si se reduce la longitud a la mitad?',a:['Se reduce a la mitad','Se duplica','Se cuadruplica'],c:0,e:'R es directamente proporcional a L, por eso al reducir L a la mitad tambiÈn se reduce R a la mitad.'},
-{q:'øPor quÈ el cobre se usa en cables y el pl·stico en su recubrimiento?',a:['Cobre conductor y pl·stico aislante','Ambos son aislantes perfectos','El pl·stico conduce mejor que el cobre'],c:0,e:'El cobre facilita el movimiento de cargas y el pl·stico reduce el riesgo de contacto elÈctrico.'},
-{q:'En R = ?L/A, si la resistividad aumenta y la geometrÌa no cambia, RÖ',a:['Aumenta','Disminuye','No depende de ?'],c:0,e:'La resistencia es directamente proporcional a la resistividad.'},
-{q:'Dos conductores tienen igual longitud y ·rea. øCu·l tendr· menor resistencia?',a:['El de menor resistividad','El de mayor resistividad','Siempre el m·s pesado'],c:0,e:'Con la misma geometrÌa, R es proporcional a ?; menor resistividad implica menor resistencia.'}
+{q:'¬øQu√© expresa la ley de Pouillet para un conductor uniforme?',a:['R = œÅL/A','R = I/V','R = Q¬∑t'],c:0,e:'La resistencia depende de la resistividad, la longitud y el √°rea transversal: R = œÅL/A.'},
+{q:'Si la longitud de un alambre se triplica y todo lo dem√°s permanece constante, la resistencia‚Ä¶',a:['Se triplica','Se reduce a un tercio','No cambia'],c:0,e:'La resistencia es directamente proporcional a la longitud.'},
+{q:'Si el √°rea transversal se duplica, manteniendo iguales los dem√°s factores, la resistencia‚Ä¶',a:['Se duplica','Se reduce a la mitad','Se cuadruplica'],c:1,e:'La resistencia es inversamente proporcional al √°rea transversal.'},
+{q:'¬øQu√© s√≠mbolo representa la resistividad del material?',a:['œÅ (rho)','Q','t'],c:0,e:'La resistividad œÅ caracteriza la oposici√≥n propia del material al paso de corriente.'},
+{q:'¬øCu√°l de estos materiales suele ser un buen conductor el√©ctrico?',a:['Cobre','Vidrio seco','Caucho'],c:0,e:'El cobre tiene muchos electrones libres y se utiliza ampliamente en cables el√©ctricos.'},
+{q:'¬øCu√°l es un ejemplo t√≠pico de material aislante?',a:['Aluminio','Cobre','Pl√°stico seco'],c:2,e:'El pl√°stico seco dificulta el movimiento de cargas y se usa como aislante.'},
+{q:'¬øQu√© ocurre con la resistencia de un mismo material si aumenta su longitud?',a:['Aumenta','Disminuye','Siempre vale cero'],c:0,e:'Un conductor m√°s largo ofrece mayor resistencia, si el √°rea y el material no cambian.'},
+{q:'Dos alambres del mismo material y longitud: uno tiene el doble de √°rea que el otro. El m√°s grueso tiene‚Ä¶',a:['La mitad de resistencia','El doble de resistencia','La misma resistencia necesariamente'],c:0,e:'Al duplicar el √°rea transversal, la resistencia se reduce a la mitad.'},
+{q:'¬øQu√© magnitud caracteriza la oposici√≥n de un objeto concreto al paso de corriente?',a:['Resistencia el√©ctrica','Carga elemental','Tiempo de recorrido'],c:0,e:'La resistencia el√©ctrica se mide en ohmios (Œ©) y depende del material y de la geometr√≠a.'},
+{q:'¬øEn qu√© unidad se mide la resistencia el√©ctrica?',a:['Ohmio (Œ©)','Amperio (A)','Coulomb (C)'],c:0,e:'La unidad de resistencia en el SI es el ohmio.'},
+{q:'Un alambre se hace m√°s delgado, conservando material y longitud. Su resistencia‚Ä¶',a:['Aumenta','Disminuye','No cambia'],c:0,e:'Al disminuir el √°rea de secci√≥n, aumenta la resistencia.'},
+{q:'¬øQu√© ocurre con la resistencia si se reduce la longitud a la mitad?',a:['Se reduce a la mitad','Se duplica','Se cuadruplica'],c:0,e:'R es directamente proporcional a L, por eso al reducir L a la mitad tambi√©n se reduce R a la mitad.'},
+{q:'¬øPor qu√© el cobre se usa en cables y el pl√°stico en su recubrimiento?',a:['Cobre conductor y pl√°stico aislante','Ambos son aislantes perfectos','El pl√°stico conduce mejor que el cobre'],c:0,e:'El cobre facilita el movimiento de cargas y el pl√°stico reduce el riesgo de contacto el√©ctrico.'},
+{q:'En R = œÅL/A, si la resistividad aumenta y la geometr√≠a no cambia, R‚Ä¶',a:['Aumenta','Disminuye','No depende de œÅ'],c:0,e:'La resistencia es directamente proporcional a la resistividad.'},
+{q:'Dos conductores tienen igual longitud y √°rea. ¬øCu√°l tendr√° menor resistencia?',a:['El de menor resistividad','El de mayor resistividad','Siempre el m√°s pesado'],c:0,e:'Con la misma geometr√≠a, R es proporcional a œÅ; menor resistividad implica menor resistencia.'}
 ],
 [
-{q:'øCu·l es la forma correcta de la ley de Ohm?',a:['V = I∑R','V = I + R','V = R/I'],c:0,e:'La diferencia de potencial es igual al producto de la corriente por la resistencia.'},
-{q:'Una resistencia de 6 O se conecta a 12 V. øQuÈ corriente circula?',a:['2 A','0,5 A','72 A'],c:0,e:'I = V/R = 12/6 = 2 A.'},
-{q:'Por una resistencia de 4 O circulan 3 A. øCu·l es el voltaje?',a:['12 V','7 V','1,33 V'],c:0,e:'V = I∑R = 3∑4 = 12 V.'},
-{q:'Un circuito tiene 9 V y una corriente de 0,5 A. øCu·l es su resistencia?',a:['18 O','4,5 O','9,5 O'],c:0,e:'R = V/I = 9/0,5 = 18 O.'},
-{q:'Si el voltaje se duplica y la resistencia permanece constante, la corrienteÖ',a:['Se duplica','Se reduce a la mitad','No cambia'],c:0,e:'I = V/R: con R constante, la corriente es directamente proporcional al voltaje.'},
-{q:'Si la resistencia se duplica con voltaje constante, la corrienteÖ',a:['Se reduce a la mitad','Se duplica','Se cuadruplica'],c:0,e:'I = V/R, por tanto la corriente es inversamente proporcional a la resistencia.'},
-{q:'øQuÈ instrumento mide la diferencia de potencial entre dos puntos?',a:['VoltÌmetro','AmperÌmetro','DinamÛmetro'],c:0,e:'El voltÌmetro mide el voltaje y se conecta en paralelo con el elemento.'},
-{q:'Una l·mpara tiene una resistencia de 10 O y circula 0,8 A. øQuÈ voltaje tiene aplicado?',a:['8 V','12,5 V','0,08 V'],c:0,e:'V = I∑R = 0,8∑10 = 8 V.'},
-{q:'Con 24 V aplicados a una resistencia de 8 O, la corriente esÖ',a:['3 A','16 A','192 A'],c:0,e:'I = V/R = 24/8 = 3 A.'},
-{q:'Si V = 15 V e I = 3 A, la resistencia valeÖ',a:['5 O','45 O','0,2 O'],c:0,e:'R = V/I = 15/3 = 5 O.'},
-{q:'øQuÈ condiciÛn describe mejor un conductor Ûhmico a temperatura constante?',a:['V e I son proporcionales','V siempre es cero','La resistencia cambia aleatoriamente'],c:0,e:'Un elemento Ûhmico cumple V = IR con resistencia constante en las condiciones consideradas.'},
-{q:'Si por una resistencia constante circula 2 A con 10 V, øquÈ corriente habr· con 15 V?',a:['3 A','1,5 A','5 A'],c:0,e:'Primero R = 10/2 = 5 O; luego I = 15/5 = 3 A.'},
-{q:'Una resistencia de 20 O est· conectada a 100 V. øQuÈ intensidad circula?',a:['5 A','0,2 A','2000 A'],c:0,e:'I = V/R = 100/20 = 5 A.'},
-{q:'øQuÈ representa el voltaje en un circuito?',a:['Diferencia de potencial elÈctrico entre dos puntos','Cantidad de materia del cable','N˙mero de electrones en el ·tomo'],c:0,e:'El voltaje es la diferencia de potencial elÈctrico entre dos puntos.'},
-{q:'Si V = 6 V y R = 3 O, øquÈ intensidad circula?',a:['2 A','18 A','0,5 A'],c:0,e:'I = V/R = 6/3 = 2 A.'}
+{q:'¬øCu√°l es la forma correcta de la ley de Ohm?',a:['V = I¬∑R','V = I + R','V = R/I'],c:0,e:'La diferencia de potencial es igual al producto de la corriente por la resistencia.'},
+{q:'Una resistencia de 6 Œ© se conecta a 12 V. ¬øQu√© corriente circula?',a:['2 A','0,5 A','72 A'],c:0,e:'I = V/R = 12/6 = 2 A.'},
+{q:'Por una resistencia de 4 Œ© circulan 3 A. ¬øCu√°l es el voltaje?',a:['12 V','7 V','1,33 V'],c:0,e:'V = I¬∑R = 3¬∑4 = 12 V.'},
+{q:'Un circuito tiene 9 V y una corriente de 0,5 A. ¬øCu√°l es su resistencia?',a:['18 Œ©','4,5 Œ©','9,5 Œ©'],c:0,e:'R = V/I = 9/0,5 = 18 Œ©.'},
+{q:'Si el voltaje se duplica y la resistencia permanece constante, la corriente‚Ä¶',a:['Se duplica','Se reduce a la mitad','No cambia'],c:0,e:'I = V/R: con R constante, la corriente es directamente proporcional al voltaje.'},
+{q:'Si la resistencia se duplica con voltaje constante, la corriente‚Ä¶',a:['Se reduce a la mitad','Se duplica','Se cuadruplica'],c:0,e:'I = V/R, por tanto la corriente es inversamente proporcional a la resistencia.'},
+{q:'¬øQu√© instrumento mide la diferencia de potencial entre dos puntos?',a:['Volt√≠metro','Amper√≠metro','Dinam√≥metro'],c:0,e:'El volt√≠metro mide el voltaje y se conecta en paralelo con el elemento.'},
+{q:'Una l√°mpara tiene una resistencia de 10 Œ© y circula 0,8 A. ¬øQu√© voltaje tiene aplicado?',a:['8 V','12,5 V','0,08 V'],c:0,e:'V = I¬∑R = 0,8¬∑10 = 8 V.'},
+{q:'Con 24 V aplicados a una resistencia de 8 Œ©, la corriente es‚Ä¶',a:['3 A','16 A','192 A'],c:0,e:'I = V/R = 24/8 = 3 A.'},
+{q:'Si V = 15 V e I = 3 A, la resistencia vale‚Ä¶',a:['5 Œ©','45 Œ©','0,2 Œ©'],c:0,e:'R = V/I = 15/3 = 5 Œ©.'},
+{q:'¬øQu√© condici√≥n describe mejor un conductor √≥hmico a temperatura constante?',a:['V e I son proporcionales','V siempre es cero','La resistencia cambia aleatoriamente'],c:0,e:'Un elemento √≥hmico cumple V = IR con resistencia constante en las condiciones consideradas.'},
+{q:'Si por una resistencia constante circula 2 A con 10 V, ¬øqu√© corriente habr√° con 15 V?',a:['3 A','1,5 A','5 A'],c:0,e:'Primero R = 10/2 = 5 Œ©; luego I = 15/5 = 3 A.'},
+{q:'Una resistencia de 20 Œ© est√° conectada a 100 V. ¬øQu√© intensidad circula?',a:['5 A','0,2 A','2000 A'],c:0,e:'I = V/R = 100/20 = 5 A.'},
+{q:'¬øQu√© representa el voltaje en un circuito?',a:['Diferencia de potencial el√©ctrico entre dos puntos','Cantidad de materia del cable','N√∫mero de electrones en el √°tomo'],c:0,e:'El voltaje es la diferencia de potencial el√©ctrico entre dos puntos.'},
+{q:'Si V = 6 V y R = 3 Œ©, ¬øqu√© intensidad circula?',a:['2 A','18 A','0,5 A'],c:0,e:'I = V/R = 6/3 = 2 A.'}
 ]
 ];
 const $=id=>document.getElementById(id);let soundOn=true,musicOn=true,audioCtx=null,musicTimer=null,spinAngle=0,spinning=false,student=null,score=0,correct=0,streak=0,round=0,current=null,answered=false,usedQuestionIds=new Set(),timerInterval=null,timeLeft=15;
 
-// Funciones asÌncronas para conectar con Supabase
 async function getRecords(){
   const { data, error } = await supabaseClient.from('participaciones').select('*').order('created_at', { ascending: false });
   if (error) { console.error('Error al obtener registros:', error); return []; }
@@ -104,7 +243,7 @@ function audio(){if(!audioCtx){const A=window.AudioContext||window.webkitAudioCo
 function tone(freq,dur=.12,type='sine',vol=.07,delay=0){if(!soundOn)return;const a=audio();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,a.currentTime+delay);g.gain.setValueAtTime(.0001,a.currentTime+delay);g.gain.exponentialRampToValueAtTime(vol,a.currentTime+delay+.015);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+delay+dur);o.connect(g);g.connect(a.destination);o.start(a.currentTime+delay);o.stop(a.currentTime+delay+dur+.03)}function sfx(kind){if(!soundOn)return;if(kind==='click')tone(540,.07,'triangle',.04);if(kind==='spin'){[440,520,610,720,850].forEach((f,i)=>tone(f,.07,'square',.025,i*.08))}if(kind==='correct'){const fanfares=[[523,659,784,1046,1318],[784,988,1175,1568],[659,784,988,1318,1568],[587,740,880,1175,1480]];const seq=fanfares[Math.floor(Math.random()*fanfares.length)];seq.forEach((f,i)=>tone(f,.24,'triangle',.075,i*.105));tone(1046,.45,'sine',.04,.48)}if(kind==='wrong'){tone(220,.2,'sawtooth',.035);tone(165,.25,'sawtooth',.025,.12)}if(kind==='win'){[523,659,784,1046,1318,1568].forEach((f,i)=>tone(f,.28,'triangle',.07,i*.12))}}
 function confetti(){const layer=document.createElement('div');layer.className='confetti-layer';layer.setAttribute('aria-hidden','true');document.body.appendChild(layer);const colors=['#00a6d6','#ffd166','#e85d75','#16a879','#6c63d9','#ff8c42','#e94e9b'];for(let i=0;i<110;i++){const piece=document.createElement('i');piece.style.left=(Math.random()*100)+'vw';piece.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];piece.style.animationDelay=(Math.random()*.7)+'s';piece.style.animationDuration=(1.8+Math.random()*1.8)+'s';piece.style.setProperty('--drift',((Math.random()-.5)*240)+'px');piece.style.transform='rotate('+(Math.random()*360)+'deg)';layer.appendChild(piece)}setTimeout(()=>layer.remove(),4300)}
 function startMusic(){stopMusic();if(!musicOn)return;const melody=[392,494,587,494,440,523,659,523,392,494,587,784,659,587,494,440];let i=0;musicTimer=setInterval(()=>{if(musicOn&&soundOn)tone(melody[i++%melody.length],.22,'sine',.012);},330)}function stopMusic(){if(musicTimer)clearInterval(musicTimer);musicTimer=null}
-$('musicBtn').onclick=()=>{musicOn=!musicOn;$('musicBtn').textContent='? M˙sica: '+(musicOn?'activada':'apagada');if(musicOn)startMusic();else stopMusic()};$('soundBtn').onclick=()=>{soundOn=!soundOn;$('soundBtn').textContent=(soundOn?'?? Sonidos: activados':'?? Sonidos: apagados');if(soundOn&&musicOn)startMusic()};
+$('musicBtn').onclick=()=>{musicOn=!musicOn;$('musicBtn').textContent='‚ô´ M√∫sica: '+(musicOn?'activada':'apagada');if(musicOn)startMusic();else stopMusic()};$('soundBtn').onclick=()=>{soundOn=!soundOn;$('soundBtn').textContent=(soundOn?'üîä Sonidos: activados':'üîá Sonidos: apagados');if(soundOn&&musicOn)startMusic()};
 const canvas=$('wheel'),ctx=canvas.getContext('2d');function drawWheel(angle=0){const n=CATS.length,r=canvas.width/2,arc=2*Math.PI/n;ctx.clearRect(0,0,700,700);ctx.save();ctx.translate(r,r);ctx.rotate(angle);for(let i=0;i<n;i++){const a0=-Math.PI/2+i*arc,a1=a0+arc;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r-13,a0,a1);ctx.closePath();ctx.fillStyle=CATS[i].color;ctx.fill();ctx.lineWidth=7;ctx.strokeStyle='#fff';ctx.stroke();ctx.save();ctx.rotate(a0+arc/2);ctx.textAlign='right';ctx.fillStyle='#17213d';ctx.font='900 25px system-ui';const words=CATS[i].short.split(' ');if(words.length>1){ctx.fillText(words[0],r-45,-4);ctx.fillText(words.slice(1).join(' '),r-45,25)}else ctx.fillText(words[0],r-45,9);ctx.restore()}ctx.beginPath();ctx.arc(0,0,64,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=8;ctx.strokeStyle='#29375d';ctx.stroke();ctx.restore()}drawWheel();
 
 $('registerForm').addEventListener('submit',async e=>{
@@ -114,25 +253,25 @@ $('registerForm').addEventListener('submit',async e=>{
   
   student={name,course};
   score=0;correct=0;streak=0;round=0;usedQuestionIds=new Set();
-  $('studentBadge').textContent=name+' ∑ '+course;
+  $('studentBadge').textContent=name+' ¬∑ '+course;
   updateStats();show('gameScreen');startMusic();sfx('click');resetRound()
 });
 
-function updateStats(){$('score').textContent=score;$('round').textContent=Math.min(round+1,15)+'/15';$('streak').textContent=streak+' ??';$('progress').style.width=(round/15*100)+'%'}
+function updateStats(){$('score').textContent=score;$('round').textContent=Math.min(round+1,15)+'/15';$('streak').textContent=streak+' üî•';$('progress').style.width=(round/15*100)+'%'}
 function stopQuestionTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null}}
 function startQuestionTimer(){stopQuestionTimer();timeLeft=15;$('timerText').textContent=timeLeft+' s';$('timerFill').style.width='100%';$('timerFill').classList.remove('urgent');timerInterval=setInterval(()=>{if(answered){stopQuestionTimer();return}timeLeft--;$('timerText').textContent=timeLeft+' s';$('timerFill').style.width=(timeLeft/15*100)+'%';if(timeLeft<=5)$('timerFill').classList.add('urgent');if(timeLeft<=0){stopQuestionTimer();answer(-1,null,true)}},1000)}
-function resetRound(){stopQuestionTimer();answered=false;current=null;$('answers').innerHTML='';$('feedback').textContent='';$('nextBtn').classList.add('hidden');$('spinBtn').disabled=false;$('questionArea').innerHTML='<div class="category">PREGUNTA '+(round+1)+' DE 15</div><h3 class="question">Gira la ruleta para descubrir tu categorÌa.</h3><p class="note">Cada respuesta correcta suma 3 puntos. Dispones de 15 segundos por pregunta.</p>';updateStats()}
+function resetRound(){stopQuestionTimer();answered=false;current=null;$('answers').innerHTML='';$('feedback').textContent='';$('nextBtn').classList.add('hidden');$('spinBtn').disabled=false;$('questionArea').innerHTML='<div class="category">PREGUNTA '+(round+1)+' DE 15</div><h3 class="question">Gira la ruleta para descubrir tu categor√≠a.</h3><p class="note">Cada respuesta correcta suma 3 puntos. Dispones de 15 segundos por pregunta.</p>';updateStats()}
 function chooseQuestion(cat){const available=QS[cat].map((q,i)=>({q,i,id:cat+'-'+i})).filter(x=>!usedQuestionIds.has(x.id));if(!available.length){QS[cat].forEach((q,i)=>usedQuestionIds.delete(cat+'-'+i));return chooseQuestion(cat)}const item=available[Math.floor(Math.random()*available.length)];usedQuestionIds.add(item.id);return item.q}
 $('spinBtn').onclick=()=>{if(spinning||answered)return;audio();spinning=true;$('spinBtn').disabled=true;sfx('spin');const chosen=Math.floor(Math.random()*CATS.length),arc=2*Math.PI/CATS.length;const desired=((-(chosen*arc+arc/2))%(Math.PI*2)+Math.PI*2)%(Math.PI*2);const start=spinAngle,extra=Math.PI*2*(5+Math.floor(Math.random()*3)),delta=extra+((desired-start%(Math.PI*2)+Math.PI*2)%(Math.PI*2)),begin=performance.now(),duration=3600;function frame(now){const t=Math.min(1,(now-begin)/duration),ease=1-Math.pow(1-t,4);spinAngle=start+delta*ease;drawWheel(spinAngle);if(t<1)requestAnimationFrame(frame);else{spinAngle=spinAngle%(Math.PI*2);drawWheel(spinAngle);spinning=false;current={cat:chosen,q:chooseQuestion(chosen)};renderQuestion();}}requestAnimationFrame(frame)};
 function renderQuestion(){const cat=CATS[current.cat],q=current.q;const choices=q.a.map((text,index)=>({text,correct:index===q.c}));for(let k=choices.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[choices[k],choices[j]]=[choices[j],choices[k]]}q.a=choices.map(x=>x.text);q.c=choices.findIndex(x=>x.correct);$('questionArea').innerHTML='<div class="category" style="color:'+cat.color+'">'+cat.name+'</div><h3 class="question">'+q.q+'</h3><p class="tiny">Elige una sola respuesta antes de que termine el tiempo.</p>';$('answers').innerHTML='';q.a.forEach((a,i)=>{const b=document.createElement('button');b.className='answer';b.textContent=String.fromCharCode(65+i)+') '+a;b.onclick=()=>answer(i,b);$('answers').appendChild(b)});$('feedback').textContent='';startQuestionTimer();}
-function answer(i,btn,timedOut=false){if(answered)return;answered=true;stopQuestionTimer();const q=current.q,buttons=[...$('answers').querySelectorAll('button')];buttons.forEach((b,j)=>{b.disabled=true;if(j===q.c)b.classList.add('correct')});if(i===q.c){score+=3;correct++;streak++;if(btn)btn.classList.add('correct');$('feedback').innerHTML='?? <strong>°EXCELENTE! +3 puntos. °Carga positiva de aprendizaje!</strong> '+q.e;sfx('correct');confetti()}else{streak=0;if(btn)btn.classList.add('wrong');$('feedback').innerHTML=(timedOut?'? <strong>°Se acabÛ el tiempo!</strong> ':'?? <strong>°Sigue aprendiendo!</strong> ')+q.e;sfx('wrong')}round++;updateStats();$('progress').style.width=(round/15*100)+'%';$('nextBtn').classList.remove('hidden');$('nextBtn').textContent=round>=15?'Ver resultado ??':'Siguiente pregunta ?';$('spinBtn').disabled=true}
+function answer(i,btn,timedOut=false){if(answered)return;answered=true;stopQuestionTimer();const q=current.q,buttons=[...$('answers').querySelectorAll('button')];buttons.forEach((b,j)=>{b.disabled=true;if(j===q.c)b.classList.add('correct')});if(i===q.c){score+=3;correct++;streak++;if(btn)btn.classList.add('correct');$('feedback').innerHTML='üéâ <strong>¬°EXCELENTE! +3 puntos. ¬°Carga positiva de aprendizaje!</strong> '+q.e;sfx('correct');confetti()}else{streak=0;if(btn)btn.classList.add('wrong');$('feedback').innerHTML=(timedOut?'‚è∞ <strong>¬°Se acab√≥ el tiempo!</strong> ':'üí° <strong>¬°Sigue aprendiendo!</strong> ')+q.e;sfx('wrong')}round++;updateStats();$('progress').style.width=(round/15*100)+'%';$('nextBtn').classList.remove('hidden');$('nextBtn').textContent=round>=15?'Ver resultado üèÜ':'Siguiente pregunta ‚ûú';$('spinBtn').disabled=true}
 $('nextBtn').onclick=()=>{if(round>=15){finishGame();return}resetRound()};
 
 async function finishGame(){
   stopQuestionTimer();
   const rec={name:student.name,course:student.course,score,correct,total:15,date:new Date().toLocaleString('es-BO'),timestamp:Date.now()};
   await saveRecord(rec);
-  $('resultSummary').textContent=student.name+' ó °Buen trabajo!';
+  $('resultSummary').textContent=student.name+' ‚Äî ¬°Buen trabajo!';
   $('finalScore').textContent=score;
   $('finalCorrect').textContent=correct+'/15';
   $('progress').style.width='100%';
@@ -146,7 +285,7 @@ $('backBtn').onclick=()=>show(student?'gameScreen':'registerScreen');
 
 $('teacherForm').addEventListener('submit',async e=>{
   e.preventDefault();
-  if($('teacherCode').value!=='12357911'){alert('CÛdigo incorrecto.');sfx('wrong');return}
+  if($('teacherCode').value!=='12357911'){alert('C√≥digo incorrecto.');sfx('wrong');return}
   $('teacherLogin').classList.add('hidden');
   $('teacherData').classList.remove('hidden');
   await renderTeacher();
@@ -166,13 +305,13 @@ async function renderTeacher(){
   $('averageScore').textContent=rs.length?Math.round(rs.reduce((s,r)=>s+r.score,0)/rs.length):0;
   $('bestScore').textContent=rs.length?Math.max(...rs.map(r=>r.score)):0;
   $('recordsBody').innerHTML='';
-  if(!rs.length){$('recordsBody').innerHTML='<tr><td colspan="6" class="empty">TodavÌa no hay participaciones registradas en la base de datos.</td></tr>';return}
+  if(!rs.length){$('recordsBody').innerHTML='<tr><td colspan="6" class="empty">Todav√≠a no hay participaciones registradas en la base de datos.</td></tr>';return}
   rs.forEach((r,i)=>{const tr=document.createElement('tr');[i+1,r.name,r.course,r.score,r.correct+'/15',r.date].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});$('recordsBody').appendChild(tr)});
 }
 
 $('exportBtn').onclick=async()=>{
   const rs=await getRecords();
-  const rows=[['N∞','Estudiante','Curso','Puntaje sobre 45','Correctas de 15','Fecha'],...rs.map((r,i)=>[i+1,r.name,r.course,r.score,r.correct+'/15',r.date])];
+  const rows=[['N¬∞','Estudiante','Curso','Puntaje sobre 45','Correctas de 15','Fecha'],...rs.map((r,i)=>[i+1,r.name,r.course,r.score,r.correct+'/15',r.date])];
   const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')).join('\r\n');
   const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
   const a=document.createElement('a');a.href=url;a.download='puntajes_ruleta_electricidad.csv';a.click();URL.revokeObjectURL(url)
@@ -180,4 +319,6 @@ $('exportBtn').onclick=async()=>{
 
 startMusic();
 })();
-</script></body></html>
+</script>
+</body>
+</html>

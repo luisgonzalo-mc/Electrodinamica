@@ -268,45 +268,42 @@ function startMusic(){stopMusic();if(!musicOn)return;const melody=[392,494,587,4
 $('musicBtn').onclick=()=>{musicOn=!musicOn;$('musicBtn').textContent='♫ Música: '+(musicOn?'activada':'apagada');if(musicOn)startMusic();else stopMusic()};$('soundBtn').onclick=()=>{soundOn=!soundOn;$('soundBtn').textContent=(soundOn?'🔊 Sonidos: activados':'🔇 Sonidos: apagados');if(soundOn&&musicOn)startMusic()};
 const canvas=$('wheel'),ctx=canvas.getContext('2d');function drawWheel(angle=0){const n=CATS.length,r=canvas.width/2,arc=2*Math.PI/n;ctx.clearRect(0,0,700,700);ctx.save();ctx.translate(r,r);ctx.rotate(angle);for(let i=0;i<n;i++){const a0=-Math.PI/2+i*arc,a1=a0+arc;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,r-13,a0,a1);ctx.closePath();ctx.fillStyle=CATS[i].color;ctx.fill();ctx.lineWidth=7;ctx.strokeStyle='#fff';ctx.stroke();ctx.save();ctx.rotate(a0+arc/2);ctx.textAlign='right';ctx.fillStyle='#17213d';ctx.font='900 25px system-ui';const words=CATS[i].short.split(' ');if(words.length>1){ctx.fillText(words[0],r-45,-4);ctx.fillText(words.slice(1).join(' '),r-45,25)}else ctx.fillText(words[0],r-45,9);ctx.restore()}ctx.beginPath();ctx.arc(0,0,64,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=8;ctx.strokeStyle='#29375d';ctx.stroke();ctx.restore()}drawWheel();
 
-$('registerForm').addEventListener('submit', async e => {
+
+$('registerForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const name = $('studentName').value.trim();
   const course = $('course').value;
 
-  if (name.length < 3 || !course) return;
+  if (name.length < 3 || !course) {
+    alert('Escribe tu nombre completo y selecciona tu curso.');
+    return;
+  }
 
   const normalizedName = name.toLowerCase().replace(/\s+/g, ' ');
 
-  // Comprobar participaciones previas en este navegador.
-  let localParticipations = {};
+  // Evitar duplicados en este navegador.
+  let participations = {};
 
   try {
-    localParticipations = JSON.parse(
+    participations = JSON.parse(
       localStorage.getItem('ruletaEstudiantesUnicos') || '{}'
     );
-
-    if (
-      !localParticipations ||
-      typeof localParticipations !== 'object' ||
-      Array.isArray(localParticipations)
-    ) {
-      localParticipations = {};
-    }
   } catch (err) {
-    alert('No se pudieron leer los datos locales del navegador.');
+    participations = {};
+  }
+
+  if (
+    participations &&
+    !Array.isArray(participations) &&
+    participations[normalizedName]
+  ) {
+    alert('Este estudiante ya participó en este navegador.');
     return;
   }
 
-  if (localParticipations[normalizedName]) {
-    alert(
-      'Este estudiante ya tiene una participación registrada en este navegador.'
-    );
-    return;
-  }
-
-  // Verificar duplicados en Supabase.
-  // Si falla la consulta, no permitir continuar sin verificar.
+  // Verificar en Supabase cuando sea posible.
+  // Si la consulta falla, permitir iniciar el juego.
   if (supabaseClient) {
     try {
       const { data, error } = await supabaseClient
@@ -316,46 +313,14 @@ $('registerForm').addEventListener('submit', async e => {
         .limit(1);
 
       if (error) {
-        console.error('Error al verificar participaciones:', error);
-        alert(
-          'No se pudo verificar la participación en la base de datos. ' +
-          'Comprueba la conexión y los permisos e inténtalo nuevamente.'
-        );
-        return;
-      }
-
-      if (data && data.length > 0) {
-        alert(
-          'Este nombre ya tiene una participación registrada. ' +
-          'Solo se permite una participación.'
-        );
+        console.error('Error de verificación Supabase:', error);
+      } else if (data && data.length > 0) {
+        alert('Este nombre ya está registrado.');
         return;
       }
     } catch (err) {
-      console.error('Error de conexión con Supabase:', err);
-      alert('No se pudo verificar la participación. Inténtalo nuevamente.');
-      return;
+      console.error('No se pudo verificar en Supabase:', err);
     }
-  } else {
-    alert(
-      'La conexión con Supabase no está disponible. ' +
-      'No se iniciará el desafío para evitar registros incompletos.'
-    );
-    return;
-  }
-
-  // Registrar el bloqueo local después de verificar la consulta.
-  try {
-    localParticipations[normalizedName] = true;
-
-    localStorage.setItem(
-      'ruletaEstudiantesUnicos',
-      JSON.stringify(localParticipations)
-    );
-  } catch (err) {
-    console.error('No se pudo guardar el control local:', err);
-    alert('No se pudo preparar el registro local. Inténtalo nuevamente.');
-    return;
   }
 
   student = { name, course };
@@ -365,14 +330,25 @@ $('registerForm').addEventListener('submit', async e => {
   round = 0;
   usedQuestionIds = new Set();
 
-  $('studentBadge').textContent = name + ' · ' + course;
+  // Guardar el bloqueo local sin impedir el inicio si falla.
+  try {
+    participations[normalizedName] = true;
+    localStorage.setItem(
+      'ruletaEstudiantesUnicos',
+      JSON.stringify(participations)
+    );
+  } catch (err) {
+    console.warn('No se pudo guardar el control local:', err);
+  }
 
+  $('studentBadge').textContent = name + ' · ' + course;
   updateStats();
   show('gameScreen');
   startMusic();
   sfx('click');
   resetRound();
 });
+
   updateStats();
   show('gameScreen');
   startMusic();

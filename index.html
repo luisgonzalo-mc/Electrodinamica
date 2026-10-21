@@ -270,44 +270,109 @@ const canvas=$('wheel'),ctx=canvas.getContext('2d');function drawWheel(angle=0){
 
 $('registerForm').addEventListener('submit', async e => {
   e.preventDefault();
+
   const name = $('studentName').value.trim();
   const course = $('course').value;
+
   if (name.length < 3 || !course) return;
 
-  // Normalizamos el nombre para evitar duplicados por mayúsculas o espacios extra
   const normalizedName = name.toLowerCase().replace(/\s+/g, ' ');
 
-  // Verificamos localmente en este navegador si ya participó
-  const localParticipations = JSON.parse(localStorage.getItem('ruletaEstudiantesUnicos') || '{}');
-  if (localParticipations[normalizedName]) {
-    alert('Este estudiante ya tiene una participación registrada. Solo se permite un intento por alumno.');
+  // Comprobar participaciones previas en este navegador.
+  let localParticipations = {};
+
+  try {
+    localParticipations = JSON.parse(
+      localStorage.getItem('ruletaEstudiantesUnicos') || '{}'
+    );
+
+    if (
+      !localParticipations ||
+      typeof localParticipations !== 'object' ||
+      Array.isArray(localParticipations)
+    ) {
+      localParticipations = {};
+    }
+  } catch (err) {
+    alert('No se pudieron leer los datos locales del navegador.');
     return;
   }
 
-  // Verificamos también en la base de datos de Supabase (si está conectada)
+  if (localParticipations[normalizedName]) {
+    alert(
+      'Este estudiante ya tiene una participación registrada en este navegador.'
+    );
+    return;
+  }
+
+  // Verificar duplicados en Supabase.
+  // Si falla la consulta, no permitir continuar sin verificar.
   if (supabaseClient) {
     try {
       const { data, error } = await supabaseClient
         .from('participaciones')
         .select('nombre')
-        .ilike('nombre', name); // Busca el nombre sin importar mayúsculas/minúsculas
+        .ilike('nombre', name)
+        .limit(1);
+
+      if (error) {
+        console.error('Error al verificar participaciones:', error);
+        alert(
+          'No se pudo verificar la participación en la base de datos. ' +
+          'Comprueba la conexión y los permisos e inténtalo nuevamente.'
+        );
+        return;
+      }
 
       if (data && data.length > 0) {
-        alert('Este nombre ya se encuentra registrado en la base de datos institucional. Solo se permite una participación.');
+        alert(
+          'Este nombre ya tiene una participación registrada. ' +
+          'Solo se permite una participación.'
+        );
         return;
       }
     } catch (err) {
-      console.error('Error al verificar duplicados:', err);
+      console.error('Error de conexión con Supabase:', err);
+      alert('No se pudo verificar la participación. Inténtalo nuevamente.');
+      return;
     }
+  } else {
+    alert(
+      'La conexión con Supabase no está disponible. ' +
+      'No se iniciará el desafío para evitar registros incompletos.'
+    );
+    return;
   }
 
-  // Guardamos localmente para bloquear futuros intentos en este mismo dispositivo
-  localParticipations[normalizedName] = true;
-  localStorage.setItem('ruletaEstudiantesUnicos', JSON.stringify(localParticipations));
+  // Registrar el bloqueo local después de verificar la consulta.
+  try {
+    localParticipations[normalizedName] = true;
+
+    localStorage.setItem(
+      'ruletaEstudiantesUnicos',
+      JSON.stringify(localParticipations)
+    );
+  } catch (err) {
+    console.error('No se pudo guardar el control local:', err);
+    alert('No se pudo preparar el registro local. Inténtalo nuevamente.');
+    return;
+  }
 
   student = { name, course };
-  score = 0; correct = 0; streak = 0; round = 0; usedQuestionIds = new Set();
+  score = 0;
+  correct = 0;
+  streak = 0;
+  round = 0;
+  usedQuestionIds = new Set();
+
   $('studentBadge').textContent = name + ' · ' + course;
+
+  updateStats();
+  show('gameScreen');
+  startMusic();
+  sfx('click');
+  resetRound();
+});
   updateStats();
   show('gameScreen');
   startMusic();

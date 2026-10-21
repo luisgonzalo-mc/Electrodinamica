@@ -349,12 +349,6 @@ $('registerForm').addEventListener('submit', async (e) => {
   resetRound();
 });
 
-  updateStats();
-  show('gameScreen');
-  startMusic();
-  sfx('click');
-  resetRound();
-});
   const name=$('studentName').value.trim(),course=$('course').value;
   if(name.length<3||!course)return;
   student={name,course};

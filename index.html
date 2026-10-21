@@ -349,13 +349,6 @@ $('registerForm').addEventListener('submit', async (e) => {
   resetRound();
 });
 
-  const name=$('studentName').value.trim(),course=$('course').value;
-  if(name.length<3||!course)return;
-  student={name,course};
-  score=0;correct=0;streak=0;round=0;usedQuestionIds=new Set();
-  $('studentBadge').textContent=name+' · '+course;
-  updateStats();show('gameScreen');startMusic();sfx('click');resetRound()
-});
 
 function updateStats(){$('score').textContent=score;$('round').textContent=Math.min(round+1,15)+'/15';$('streak').textContent=streak+' 🔥';$('progress').style.width=(round/15*100)+'%'}
 function stopQuestionTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null}}
